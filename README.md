@@ -1,70 +1,218 @@
-# Getting Started with Create React App
+# 🧬 Huberman Protocol Optimizer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive lifestyle optimization app based on Dr. Andrew Huberman's evidence-based protocols for health, productivity, and performance optimization.
 
-## Available Scripts
+## ✨ Features
 
-In the project directory, you can run:
+### 🔐 User Authentication
 
-### `npm start`
+- **Secure Registration & Login** with JWT tokens
+- **Persistent User Data** - your protocols and progress are saved
+- **User Profile Management** with preferences
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 📚 Protocol Library
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **6 Categories**: Morning Routine, Sleep, Exercise, Nutrition, Focus, Recovery
+- **12+ Detailed Protocols** including Morning Light Exposure, Cold Exposure, NSDR
+- **Beautiful Material Design** with expandable cards and visual indicators
+- **Smart Filtering** by category with difficulty levels
 
-### `npm test`
+### 🏠 Personal Wall
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Add/Remove Protocols** to your personal dashboard
+- **Progress Tracking** with sliders, notes, and visual feedback
+- **Visual Cards** showing completion status and streaks
+- **Real-time Updates** with backend synchronization
 
-### `npm run build`
+### 📊 Progress Analytics
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Overall Progress** with trend indicators
+- **Streak Tracking** for consistency
+- **Top Performers** and protocols needing attention
+- **Timeframe Views** (daily, weekly, monthly)
+- **Visual Progress Bars** and performance metrics
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 📱 Mobile-First Design
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Fully Responsive** - works on desktop, tablet, and mobile
+- **Touch-Friendly** interactions and navigation
+- **Material Design** principles throughout
+- **Cross-Platform** compatibility
 
-### `npm run eject`
+## 🚀 Quick Start
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Prerequisites
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Node.js (v14 or higher)
+- MongoDB (local or cloud instance)
+- npm or yarn
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Installation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **Clone the repository**
 
-## Learn More
+   ```bash
+   git clone <repository-url>
+   cd k8s-react-app
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **Install dependencies**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```bash
+   npm install
+   npm run install-server
+   ```
 
-### Code Splitting
+3. **Set up MongoDB**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   - Install MongoDB locally or use MongoDB Atlas
+   - Update the connection string in `server/.env` if needed
 
-### Analyzing the Bundle Size
+4. **Start the development servers**
+   ```bash
+   npm run dev
+   ```
+   This will start both the frontend (React) and backend (Node.js) servers.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Alternative: Manual Start
 
-### Making a Progressive Web App
+If you prefer to start servers separately:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+**Terminal 1 - Backend:**
 
-### Advanced Configuration
+```bash
+cd server
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+**Terminal 2 - Frontend:**
 
-### Deployment
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🔧 Configuration
 
-### `npm run build` fails to minify
+### Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Create a `.env` file in the `server` directory:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/huberman-protocols
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+PORT=5000
+NODE_ENV=development
+```
+
+### API Endpoints
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **Health Check**: http://localhost:5000/api/health
+
+## 📱 Usage
+
+1. **Register/Login**: Create an account or sign in
+2. **Browse Protocols**: Explore the protocol library by category
+3. **Add to Wall**: Select protocols that interest you
+4. **Track Progress**: Update your daily progress with notes
+5. **View Analytics**: Monitor your performance and streaks
+
+## 🏗️ Architecture
+
+### Frontend (React)
+
+- **Material-UI** for consistent design system
+- **Context API** for state management
+- **Axios** for API communication
+- **Responsive Design** with mobile-first approach
+
+### Backend (Node.js/Express)
+
+- **MongoDB** for data persistence
+- **JWT** for authentication
+- **bcryptjs** for password hashing
+- **CORS** enabled for cross-origin requests
+
+### Data Models
+
+- **User Model**: Authentication, protocols, progress, preferences
+- **Protocol Schema**: Title, description, category, difficulty, benefits
+- **Progress Tracking**: Value, notes, timestamps
+
+## 🚀 Deployment
+
+### Docker Deployment
+
+The app includes Docker configuration for containerized deployment:
+
+```bash
+# Build and run with Docker
+docker build -t huberman-app .
+docker run -p 3000:3000 huberman-app
+```
+
+### Kubernetes Deployment
+
+Includes Kubernetes manifests for production deployment:
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+
+## 🧪 Development
+
+### Available Scripts
+
+- `npm start` - Start React development server
+- `npm run dev` - Start both frontend and backend
+- `npm run server` - Start backend server only
+- `npm run build` - Build for production
+- `npm test` - Run tests
+
+### Project Structure
+
+```
+k8s-react-app/
+├── src/
+│   ├── components/          # React components
+│   ├── contexts/           # React contexts
+│   └── protocolData.js     # Protocol definitions
+├── server/                 # Backend server
+│   ├── models/            # Database models
+│   ├── routes/            # API routes
+│   └── middleware/         # Auth middleware
+├── public/                 # Static assets
+└── k8s/                   # Kubernetes configs
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- **Dr. Andrew Huberman** for the evidence-based protocols
+- **Material-UI** for the design system
+- **React** community for the excellent ecosystem
+
+## 🆘 Support
+
+For issues and questions:
+
+1. Check the documentation
+2. Search existing issues
+3. Create a new issue with detailed information
+
+---
+
+**Built with ❤️ for optimizing human performance and well-being**

@@ -1,0 +1,299 @@
+{
+  "users": [
+    {
+      "id": "1761224920924",
+      "name": "rafik kouissar",
+      "email": "kouissar@gmail.com",
+      "password": "$2a$10$SP23xRWRNqUQR.ALLN9YQu.K.pOhQMPmk7ZT/OOQsHU2geu4xGWBW",
+      "protocols": [
+        {
+          "protocolId": "morning-light",
+          "title": "Morning Light Exposure",
+          "description": "Get 5-30 minutes of natural sunlight exposure into your eyes within the first 30-60 minutes of waking up.",
+          "category": "morning",
+          "difficulty": "Easy",
+          "timeRequired": "5-30 minutes",
+          "frequency": "Daily",
+          "benefits": [
+            "Sets circadian rhythm",
+            "Improves mood",
+            "Enhances energy",
+            "Better sleep quality"
+          ],
+          "instructions": [
+            "Go outside within 30-60 minutes of waking",
+            "Get direct sunlight (not through windows)",
+            "Look toward the sun (not directly at it)",
+            "Duration: 5-30 minutes depending on weather"
+          ],
+          "addedDate": "2025-10-23T13:09:06.630Z",
+          "progress": {
+            "value": 70,
+            "notes": "",
+            "date": "2025-10-26T04:50:32.419Z"
+          }
+        },
+        {
+          "protocolId": "delayed-caffeine",
+          "title": "Delayed Caffeine Intake",
+          "description": "Wait 90-120 minutes after waking before consuming caffeine to allow natural cortisol peak.",
+          "category": "morning",
+          "difficulty": "Medium",
+          "timeRequired": "0 minutes (timing)",
+          "frequency": "Daily",
+          "benefits": [
+            "Prevents energy crashes",
+            "Maintains natural energy cycles",
+            "Better long-term energy"
+          ],
+          "instructions": [
+            "Wait 90-120 minutes after waking",
+            "Allow natural cortisol and adrenaline to peak first",
+            "Then consume caffeine if desired"
+          ],
+          "addedDate": "2025-10-23T13:09:31.553Z",
+          "progress": {
+            "value": 25,
+            "notes": "",
+            "date": "2025-10-26T04:51:01.902Z"
+          }
+        },
+        {
+          "protocolId": "wim-hof-cold-therapy",
+          "title": "Wim Hof Cold Therapy",
+          "description": "Combined breathing and cold exposure for maximum benefits.",
+          "category": "exercise",
+          "difficulty": "Hard",
+          "timeRequired": "15-30 minutes",
+          "frequency": "3-4x per week",
+          "benefits": [
+            "Enhanced resilience",
+            "Improved immune function",
+            "Better stress management",
+            "Increased energy"
+          ],
+          "instructions": [
+            "Practice Wim Hof breathing first",
+            "Start with 30 seconds cold shower",
+            "Gradually increase exposure time",
+            "Focus on controlled breathing during exposure"
+          ],
+          "addedDate": "2025-10-23T22:51:31.827Z",
+          "progress": {
+            "value": 95,
+            "notes": "",
+            "date": "2025-10-26T04:51:16.472Z"
+          }
+        },
+        {
+          "protocolId": "morning-hydration",
+          "title": "Morning Hydration",
+          "description": "Drink 16-32 ounces of water immediately upon waking, often with electrolytes.",
+          "category": "morning",
+          "difficulty": "Easy",
+          "timeRequired": "2-5 minutes",
+          "frequency": "Daily",
+          "benefits": [
+            "Rehydrates body",
+            "Boosts metabolism",
+            "Improves cognitive function",
+            "Supports detoxification"
+          ],
+          "instructions": [
+            "Drink 16-32 oz of water immediately upon waking",
+            "Add a pinch of sea salt for electrolytes",
+            "Avoid caffeine for first 90-120 minutes"
+          ],
+          "addedDate": "2025-10-23T23:05:20.858Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-10-24T22:44:42.480Z"
+          }
+        },
+        {
+          "protocolId": "attia-zone-2-training",
+          "title": "Zone 2 Cardio Training",
+          "description": "Low-intensity steady-state cardio for mitochondrial health and longevity.",
+          "category": "exercise",
+          "difficulty": "Easy",
+          "timeRequired": "45-90 minutes",
+          "frequency": "3-4x per week",
+          "benefits": [
+            "Improved mitochondrial function",
+            "Better cardiovascular health",
+            "Enhanced fat burning",
+            "Increased longevity"
+          ],
+          "instructions": [
+            "Exercise at 60-70% max heart rate",
+            "Should be able to hold conversation",
+            "Duration: 45-90 minutes",
+            "Frequency: 3-4x per week"
+          ],
+          "addedDate": "2025-10-24T02:41:44.718Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-10-24T02:41:44.718Z"
+          }
+        },
+        {
+          "protocolId": "attia-protein-optimization",
+          "title": "Protein Optimization",
+          "description": "Optimize protein intake for muscle maintenance and longevity.",
+          "category": "nutrition",
+          "difficulty": "Medium",
+          "timeRequired": "5-10 minutes planning",
+          "frequency": "Daily",
+          "benefits": [
+            "Muscle preservation",
+            "Better body composition",
+            "Improved recovery",
+            "Enhanced longevity"
+          ],
+          "instructions": [
+            "1.6-2.2g protein per kg body weight",
+            "Distribute across 3-4 meals",
+            "Include complete protein sources",
+            "Time protein around workouts"
+          ],
+          "addedDate": "2025-10-24T02:42:00.610Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-10-24T02:42:00.610Z"
+          }
+        },
+        {
+          "protocolId": "attia-intermittent-fasting",
+          "title": "Intermittent Fasting",
+          "description": "Time-restricted eating to improve metabolic health and longevity.",
+          "category": "nutrition",
+          "difficulty": "Medium",
+          "timeRequired": "0 minutes (timing)",
+          "frequency": "Daily",
+          "benefits": [
+            "Improved insulin sensitivity",
+            "Enhanced autophagy",
+            "Better metabolic health",
+            "Weight management"
+          ],
+          "instructions": [
+            "16:8 or 18:6 eating window",
+            "Eat within 6-8 hour window",
+            "Stay hydrated during fasting",
+            "Start gradually and adjust"
+          ],
+          "addedDate": "2025-10-24T02:42:01.911Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-10-24T02:42:01.911Z"
+          }
+        },
+        {
+          "protocolId": "wim-hof-meditation",
+          "title": "Wim Hof Meditation",
+          "description": "Combined breathing and meditation for stress reduction and recovery.",
+          "category": "recovery",
+          "difficulty": "Medium",
+          "timeRequired": "20-30 minutes",
+          "frequency": "Daily",
+          "benefits": [
+            "Reduced stress",
+            "Better recovery",
+            "Improved focus",
+            "Enhanced well-being"
+          ],
+          "instructions": [
+            "Practice Wim Hof breathing",
+            "Follow with 10-20 minute meditation",
+            "Focus on breath and body awareness",
+            "Practice daily for best results"
+          ],
+          "addedDate": "2025-10-24T02:42:30.717Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-10-24T02:42:30.717Z"
+          }
+        }
+      ],
+      "preferences": {
+        "notifications": true,
+        "theme": "light"
+      },
+      "createdAt": "2025-10-23T13:08:40.925Z",
+      "lastLogin": "2025-10-26T04:50:11.190Z"
+    },
+    {
+      "id": "1761259427456",
+      "name": "Joe Delgado",
+      "email": "kouissar2@gmail.com",
+      "password": "$2a$10$.3BRgjTHRcyF64awbhMWB.rmAoK1eGu6NTImnE5fK.63teZAbYEnm",
+      "protocols": [
+        {
+          "protocolId": "wim-hof-breathing",
+          "title": "Wim Hof Breathing Method",
+          "description": "Controlled breathing technique to increase energy, reduce stress, and improve focus.",
+          "category": "exercise",
+          "difficulty": "Medium",
+          "timeRequired": "10-15 minutes",
+          "frequency": "Daily",
+          "benefits": [
+            "Increased energy",
+            "Reduced stress",
+            "Better focus",
+            "Enhanced immune function"
+          ],
+          "instructions": [
+            "30-40 deep breaths in rapid succession",
+            "Hold breath after final exhale",
+            "Breathe in and hold for 15 seconds",
+            "Repeat 3-4 rounds"
+          ],
+          "addedDate": "2025-10-23T22:45:41.797Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-10-23T22:45:41.797Z"
+          }
+        },
+        {
+          "protocolId": "wim-hof-cold-therapy",
+          "title": "Wim Hof Cold Therapy",
+          "description": "Combined breathing and cold exposure for maximum benefits.",
+          "category": "exercise",
+          "difficulty": "Hard",
+          "timeRequired": "15-30 minutes",
+          "frequency": "3-4x per week",
+          "benefits": [
+            "Enhanced resilience",
+            "Improved immune function",
+            "Better stress management",
+            "Increased energy"
+          ],
+          "instructions": [
+            "Practice Wim Hof breathing first",
+            "Start with 30 seconds cold shower",
+            "Gradually increase exposure time",
+            "Focus on controlled breathing during exposure"
+          ],
+          "addedDate": "2025-10-23T22:45:50.085Z",
+          "progress": {
+            "value": 100,
+            "notes": "",
+            "date": "2025-10-23T22:58:50.045Z"
+          }
+        }
+      ],
+      "preferences": {
+        "notifications": true,
+        "theme": "light"
+      },
+      "createdAt": "2025-10-23T22:43:47.456Z",
+      "lastLogin": "2025-10-23T22:58:32.443Z"
+    }
+  ]
+}
