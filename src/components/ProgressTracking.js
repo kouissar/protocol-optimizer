@@ -15,23 +15,16 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
-  Alert,
-  Button,
-  IconButton,
-  Tooltip
+  Alert
 } from '@mui/material';
 import {
   TrendingUp,
-  TrendingDown,
-  TrendingFlat,
   CheckCircle,
   Schedule,
   Star,
-  Insights,
-  CalendarToday,
-  Timeline
+  CalendarToday
 } from '@mui/icons-material';
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, differenceInDays, eachDayOfInterval } from 'date-fns';
 
 const ProgressTracking = ({ protocols }) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('week');
@@ -45,78 +38,79 @@ const ProgressTracking = ({ protocols }) => {
     let startDate, endDate, label;
 
     switch (selectedTimeframe) {
-      case 'week':
-        startDate = startOfWeek(now);
-        endDate = endOfWeek(now);
-        label = 'This Week';
-        break;
       case 'month':
         startDate = startOfMonth(now);
         endDate = endOfMonth(now);
         label = 'This Month';
         break;
+      case 'week':
       default:
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        endDate = now;
-        label = 'Last 7 Days';
+        startDate = startOfWeek(now);
+        endDate = endOfWeek(now);
+        label = 'This Week';
+        break;
     }
 
     return { startDate, endDate, label };
   };
 
+  const { startDate, endDate, label } = getTimeframeData();
+
+  const filteredProtocols = protocols.map(protocol => ({
+    ...protocol,
+    progressHistory: protocol.progressHistory?.filter(entry => 
+      isWithinInterval(new Date(entry.date), { start: startDate, end: endDate })
+    ) || []
+  }));
+
   const calculateOverallProgress = () => {
-    if (protocols.length === 0) return 0;
-    
-    const protocolsWithProgress = protocols.filter(p => p.progress);
-    if (protocolsWithProgress.length === 0) return 0;
-    
-    const totalProgress = protocolsWithProgress.reduce((sum, p) => sum + p.progress.value, 0);
-    return Math.round(totalProgress / protocolsWithProgress.length);
+    if (filteredProtocols.length === 0) return 0;
+    const totalPossibleCompletions = filteredProtocols.length * differenceInDays(endDate, startDate) + 1;
+    const totalActualCompletions = filteredProtocols.reduce((sum, p) => sum + p.progressHistory.length, 0);
+    return Math.round((totalActualCompletions / totalPossibleCompletions) * 100);
   };
 
-  const getProgressTrend = () => {
-    // This would typically come from historical data
-    // For now, we'll simulate based on current progress
-    const overallProgress = calculateOverallProgress();
-    if (overallProgress >= 80) return { direction: 'up', color: 'success', icon: TrendingUp };
-    if (overallProgress >= 60) return { direction: 'flat', color: 'warning', icon: TrendingFlat };
-    return { direction: 'down', color: 'error', icon: TrendingDown };
+  const getDaysApplied = () => {
+    const allCompletionDates = new Set();
+    filteredProtocols.forEach(p => {
+      p.progressHistory.forEach(entry => {
+        allCompletionDates.add(new Date(entry.date).toDateString());
+      });
+    });
+    return allCompletionDates.size;
+  };
+
+  const getDaysAllSatisfied = () => {
+    const interval = eachDayOfInterval({ start: startDate, end: endDate });
+    let count = 0;
+    interval.forEach(day => {
+      const allDone = filteredProtocols.every(p => 
+        p.progressHistory.some(entry => new Date(entry.date).toDateString() === day.toDateString())
+      );
+      if (allDone) {
+        count++;
+      }
+    });
+    return count;
   };
 
   const getTopPerformingProtocols = () => {
-    return protocols
-      .filter(p => p.progress)
-      .sort((a, b) => b.progress.value - a.progress.value)
+    return filteredProtocols
+      .sort((a, b) => b.progressHistory.length - a.progressHistory.length)
       .slice(0, 3);
   };
 
   const getNeedsAttentionProtocols = () => {
-    return protocols
-      .filter(p => p.progress && p.progress.value < 50)
-      .sort((a, b) => a.progress.value - b.progress.value);
+    return filteredProtocols
+      .filter(p => p.progressHistory.length === 0)
+      .sort((a, b) => a.progressHistory.length - b.progressHistory.length);
   };
 
-  const getStreakDays = () => {
-    // This would typically be calculated from historical data
-    // For now, we'll simulate based on current progress
-    const overallProgress = calculateOverallProgress();
-    if (overallProgress >= 80) return 7;
-    if (overallProgress >= 60) return 3;
-    return 1;
-  };
-
-  const getProgressColor = (value) => {
-    if (value >= 80) return 'success';
-    if (value >= 60) return 'warning';
-    return 'error';
-  };
-
-  const { startDate, endDate, label } = getTimeframeData();
   const overallProgress = calculateOverallProgress();
-  const trend = getProgressTrend();
+  const daysApplied = getDaysApplied();
+  const daysAllSatisfied = getDaysAllSatisfied();
   const topProtocols = getTopPerformingProtocols();
   const needsAttention = getNeedsAttentionProtocols();
-  const streakDays = getStreakDays();
 
   if (protocols.length === 0) {
     return (
@@ -136,39 +130,21 @@ const ProgressTracking = ({ protocols }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          📊 Progress Tracking
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<Insights />}
-          sx={{ textTransform: 'none' }}
-        >
-          Detailed Analytics
-        </Button>
-      </Box>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
+        📊 Progress Tracking
+      </Typography>
 
-      {/* Timeframe Tabs */}
       <Paper sx={{ mb: 3 }}>
         <Tabs
           value={selectedTimeframe}
           onChange={handleTimeframeChange}
           variant="fullWidth"
-          sx={{ 
-            '& .MuiTab-root': { 
-              fontSize: '0.9rem',
-              fontWeight: 500
-            } 
-          }}
         >
-          <Tab label="Last 7 Days" value="week" />
           <Tab label="This Week" value="week" />
           <Tab label="This Month" value="month" />
         </Tabs>
       </Paper>
 
-      {/* Overall Progress Card */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={4}>
           <Card sx={{ height: '100%' }}>
@@ -187,12 +163,6 @@ const ProgressTracking = ({ protocols }) => {
                 value={overallProgress} 
                 sx={{ mb: 2, height: 8, borderRadius: 4 }}
               />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <trend.icon color={trend.color} />
-                <Typography variant="body2" color={`${trend.color}.main`}>
-                  {trend.direction === 'up' ? 'Improving' : trend.direction === 'flat' ? 'Stable' : 'Needs attention'}
-                </Typography>
-              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -203,14 +173,11 @@ const ProgressTracking = ({ protocols }) => {
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <CalendarToday color="success" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Current Streak
+                  Days Applied
                 </Typography>
               </Box>
               <Typography variant="h3" color="success.main" sx={{ fontWeight: 700, mb: 1 }}>
-                {streakDays}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {streakDays === 1 ? 'day' : 'days'} in a row
+                {daysApplied}
               </Typography>
             </CardContent>
           </Card>
@@ -222,23 +189,18 @@ const ProgressTracking = ({ protocols }) => {
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <CheckCircle color="info" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Active Protocols
+                  All Protocols Satisfied
                 </Typography>
               </Box>
               <Typography variant="h3" color="info.main" sx={{ fontWeight: 700, mb: 1 }}>
-                {protocols.length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {protocols.filter(p => p.progress).length} being tracked
+                {daysAllSatisfied} days
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Protocol Performance */}
       <Grid container spacing={3}>
-        {/* Top Performing Protocols */}
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -251,29 +213,12 @@ const ProgressTracking = ({ protocols }) => {
               {topProtocols.length > 0 ? (
                 <List>
                   {topProtocols.map((protocol, index) => (
-                    <React.Fragment key={protocol.id}>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemIcon>
-                          <Chip 
-                            label={index + 1} 
-                            size="small" 
-                            color="primary"
-                            sx={{ fontWeight: 600 }}
-                          />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={protocol.title}
-                          secondary={`${protocol.progress.value}% completion`}
-                        />
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={protocol.progress.value}
-                          color={getProgressColor(protocol.progress.value)}
-                          sx={{ width: 60, ml: 2 }}
-                        />
-                      </ListItem>
-                      {index < topProtocols.length - 1 && <Divider />}
-                    </React.Fragment>
+                    <ListItem key={protocol.id} sx={{ px: 0 }}>
+                      <ListItemText
+                        primary={protocol.title}
+                        secondary={`${protocol.progressHistory.length} completions`}
+                      />
+                    </ListItem>
                   ))}
                 </List>
               ) : (
@@ -285,7 +230,6 @@ const ProgressTracking = ({ protocols }) => {
           </Card>
         </Grid>
 
-        {/* Needs Attention */}
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -298,29 +242,12 @@ const ProgressTracking = ({ protocols }) => {
               {needsAttention.length > 0 ? (
                 <List>
                   {needsAttention.map((protocol, index) => (
-                    <React.Fragment key={protocol.id}>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemIcon>
-                          <Chip 
-                            label="!" 
-                            size="small" 
-                            color="error"
-                            sx={{ fontWeight: 600 }}
-                          />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={protocol.title}
-                          secondary={`${protocol.progress.value}% completion`}
-                        />
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={protocol.progress.value}
-                          color="error"
-                          sx={{ width: 60, ml: 2 }}
-                        />
-                      </ListItem>
-                      {index < needsAttention.length - 1 && <Divider />}
-                    </React.Fragment>
+                    <ListItem key={protocol.id} sx={{ px: 0 }}>
+                      <ListItemText
+                        primary={protocol.title}
+                        secondary={`${protocol.progressHistory.length} completions`}
+                      />
+                    </ListItem>
                   ))}
                 </List>
               ) : (
@@ -333,7 +260,6 @@ const ProgressTracking = ({ protocols }) => {
         </Grid>
       </Grid>
 
-      {/* Timeframe Info */}
       <Box sx={{ mt: 3, textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
           Showing data for {label} ({format(startDate, 'MMM dd')} - {format(endDate, 'MMM dd, yyyy')})

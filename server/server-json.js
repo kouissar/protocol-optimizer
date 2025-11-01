@@ -340,14 +340,56 @@ app.put('/api/user/protocols/:protocolId/progress', auth, (req, res) => {
   }
 });
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../build')));
+// Toggle protocol completion for a specific date
+app.post('/api/user/protocols/:protocolId/completion', auth, (req, res) => {
+  try {
+    const { protocolId } = req.params;
+    const { date } = req.body;
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*' , (req, res) => {
-  res.sendFile(path.join(__dirname, '../build/index.html'));
+    const db = readDB();
+    const user = db.users.find(u => u.id === req.user.id);
+    const protocol = user.protocols.find(p => p.protocolId === protocolId);
+
+    if (!protocol) {
+      return res.status(404).json({ message: 'Protocol not found' });
+    }
+
+    const dateObj = new Date(date);
+    const history = Array.isArray(protocol.progressHistory) ? protocol.progressHistory : [];
+    const idx = history.findIndex(entry => new Date(entry.date).toDateString() === dateObj.toDateString());
+
+    if (idx > -1) {
+      history.splice(idx, 1);
+    } else {
+      history.push({ date: dateObj.toISOString() });
+    }
+
+    protocol.progressHistory = history;
+    writeDB(db);
+
+    res.json({
+      message: 'Protocol completion toggled successfully',
+      protocol: protocol
+    });
+  } catch (error) {
+    console.error('Toggle completion error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
+
+// Serve static files from the React app if build exists (production)
+const buildDir = path.join(__dirname, '../build');
+if (fs.existsSync(buildDir)) {
+  app.use(express.static(buildDir));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(buildDir, 'index.html'));
+  });
+} else {
+  // In dev, avoid ENOENT by returning a simple message on non-API routes
+  app.get('/', (req, res) => {
+    res.send('API server running. Frontend dev server is at http://localhost:3000');
+  });
+}
 
 // Start server
 app.listen(PORT, () => {

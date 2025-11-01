@@ -1,4 +1,4 @@
-# 🧬 Huberman Protocol Optimizer
+# 🧬 Multi-Expert Protocol Optimizer
 
 A comprehensive lifestyle optimization app based on Dr. Andrew Huberman's evidence-based protocols for health, productivity, and performance optimization.
 
@@ -44,7 +44,6 @@ A comprehensive lifestyle optimization app based on Dr. Andrew Huberman's eviden
 ### Prerequisites
 
 - Node.js (v14 or higher)
-- MongoDB (local or cloud instance)
 - npm or yarn
 
 ### Installation
@@ -53,7 +52,7 @@ A comprehensive lifestyle optimization app based on Dr. Andrew Huberman's eviden
 
    ```bash
    git clone <repository-url>
-   cd k8s-react-app
+   cd protocol-optimizer
    ```
 
 2. **Install dependencies**
@@ -63,12 +62,7 @@ A comprehensive lifestyle optimization app based on Dr. Andrew Huberman's eviden
    npm run install-server
    ```
 
-3. **Set up MongoDB**
-
-   - Install MongoDB locally or use MongoDB Atlas
-   - Update the connection string in `server/.env` if needed
-
-4. **Start the development servers**
+3. **Start the development servers**
    ```bash
    npm run dev
    ```
@@ -81,8 +75,7 @@ If you prefer to start servers separately:
 **Terminal 1 - Backend:**
 
 ```bash
-cd server
-npm start
+npm run server
 ```
 
 **Terminal 2 - Frontend:**
@@ -95,20 +88,14 @@ npm start
 
 ### Environment Variables
 
-Create a `.env` file in the `server` directory:
-
-```env
-MONGODB_URI=mongodb://localhost:27017/huberman-protocols
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-PORT=5000
-NODE_ENV=development
-```
+The backend server uses a `db.json` file for data persistence, so no environment variables are required for database configuration.
 
 ### API Endpoints
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5000
-- **Health Check**: http://localhost:5000/api/health
+
+**Note:** The `npm start` script has a hardcoded API URL (`http://192.168.1.169:5000`). If your backend is running on a different IP address, you will need to update the `start` script in `package.json`.
 
 ## 📱 Usage
 
@@ -129,7 +116,8 @@ NODE_ENV=development
 
 ### Backend (Node.js/Express)
 
-- **MongoDB** for data persistence
+- **Express** for the server framework
+- **lowdb** for JSON file database
 - **JWT** for authentication
 - **bcryptjs** for password hashing
 - **CORS** enabled for cross-origin requests
@@ -170,21 +158,34 @@ kubectl apply -f service.yaml
 - `npm run server` - Start backend server only
 - `npm run build` - Build for production
 - `npm test` - Run tests
+- `npm run eject` - Eject from Create React App
+- `npm run install-server` - Install server dependencies
+- `npm run start-app` - Start the application using a shell script
 
 ### Project Structure
 
 ```
-k8s-react-app/
+protocol-optimizer/
+├── Dockerfile
+├── deployment.yaml
+├── package.json
+├── public/
+├── README.md
+├── server/
+│   ├── db.json
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── server-json.js
+│   ├── server-simple.js
+│   └── server.js
+├── service.yaml
 ├── src/
-│   ├── components/          # React components
-│   ├── contexts/           # React contexts
-│   └── protocolData.js     # Protocol definitions
-├── server/                 # Backend server
-│   ├── models/            # Database models
-│   ├── routes/            # API routes
-│   └── middleware/         # Auth middleware
-├── public/                 # Static assets
-└── k8s/                   # Kubernetes configs
+│   ├── components/
+│   ├── contexts/
+│   └── protocolData.js
+├── start-app.sh
+└── start-dev.js
 ```
 
 ## 🤝 Contributing

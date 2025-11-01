@@ -248,6 +248,45 @@ app.delete('/api/user/protocols/:protocolId', auth, (req, res) => {
   }
 });
 
+// Toggle protocol completion for a specific date
+app.post('/api/user/protocols/:protocolId/completion', auth, (req, res) => {
+  try {
+    const { protocolId } = req.params;
+    const { date } = req.body;
+
+    const userRef = db.get('users').find({ id: req.user.id });
+    const protocol = userRef.get('protocols').find({ protocolId }).value();
+
+    if (!protocol) {
+      return res.status(404).json({ message: 'Protocol not found' });
+    }
+
+    const dateObj = new Date(date);
+    const history = Array.isArray(protocol.progressHistory) ? [...protocol.progressHistory] : [];
+    const idx = history.findIndex(entry => new Date(entry.date).toDateString() === dateObj.toDateString());
+
+    if (idx > -1) {
+      // Toggle off
+      history.splice(idx, 1);
+    } else {
+      // Toggle on
+      history.push({ date: dateObj.toISOString() });
+    }
+
+    const updatedProtocol = { ...protocol, progressHistory: history };
+
+    userRef.get('protocols').find({ protocolId }).assign(updatedProtocol).write();
+
+    res.json({
+      message: 'Protocol completion toggled successfully',
+      protocol: updatedProtocol
+    });
+  } catch (error) {
+    console.error('Toggle completion error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update protocol progress
 app.put('/api/user/protocols/:protocolId/progress', auth, (req, res) => {
   try {

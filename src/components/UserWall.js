@@ -37,9 +37,9 @@ import {
   Star,
   StarBorder
 } from '@mui/icons-material';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 
-const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress }) => {
+const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress, onToggleProtocolCompletion }) => {
   const [selectedProtocol, setSelectedProtocol] = useState(null);
   const [progressDialogOpen, setProgressDialogOpen] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
@@ -86,6 +86,11 @@ const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress }) => {
     return 'Getting started';
   };
 
+  const isCompletedToday = (protocol) => {
+    if (!protocol.progressHistory) return false;
+    return protocol.progressHistory.some(entry => isToday(new Date(entry.date)));
+  };
+
   if (protocols.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 8 }}>
@@ -115,7 +120,7 @@ const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress }) => {
 
       <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
         {protocols.map((protocol) => (
-          <Grid item xs={12} md={5} lg={4} key={protocol.id} sx={{ maxWidth: '500px' }}>
+          <Grid item xs={12} md={5} lg={4} key={protocol.protocolId} sx={{ maxWidth: '500px' }}>
             <Card 
               sx={{ 
                 height: '400px',
@@ -180,137 +185,33 @@ const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress }) => {
                     variant="outlined"
                   />
                 </Box>
-
-                {protocol.progress && (
-                  <Paper sx={{ p: 2, mb: 2, backgroundColor: 'grey.50' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        Progress
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        color={`${getProgressColor(protocol.progress.value)}.main`}
-                        sx={{ fontWeight: 500 }}
-                      >
-                        {protocol.progress.value}%
-                      </Typography>
-                    </Box>
-                    <Slider
-                      value={protocol.progress.value}
-                      disabled
-                      sx={{ mb: 1 }}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {getProgressText(protocol.progress.value)}
-                    </Typography>
-                    {protocol.progress.notes && (
-                      <Typography variant="caption" display="block" sx={{ mt: 1, fontStyle: 'italic' }}>
-                        "{protocol.progress.notes}"
-                      </Typography>
-                    )}
-                  </Paper>
-                )}
-
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Added: {format(protocol.addedDate, 'MMM dd, yyyy')}
-                </Typography>
               </CardContent>
 
               <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
                 <Button
-                  variant="outlined"
+                  variant={isCompletedToday(protocol) ? 'contained' : 'outlined'}
                   size="small"
-                  startIcon={<Edit />}
-                  onClick={() => handleOpenProgressDialog(protocol)}
+                  startIcon={isCompletedToday(protocol) ? <CheckCircle /> : null}
+                  onClick={() => {
+                    try {
+                      onToggleProtocolCompletion(protocol.protocolId, new Date());
+                    } catch (e) {
+                      // Fallback console for visibility if handler is missing
+                      // This should never happen in normal flow
+                      // eslint-disable-next-line no-console
+                      console.error('Toggle completion handler failed:', e);
+                    }
+                  }}
+                  disabled={isCompletedToday(protocol)}
                   sx={{ textTransform: 'none' }}
                 >
-                  {protocol.progress ? 'Update Progress' : 'Track Progress'}
+                  {isCompletedToday(protocol) ? 'Completed' : 'Mark as Done'}
                 </Button>
-                
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <IconButton size="small" color="primary">
-                    <StarBorder />
-                  </IconButton>
-                </Box>
               </CardActions>
             </Card>
           </Grid>
         ))}
       </Grid>
-
-      {/* Progress Tracking Dialog */}
-      <Dialog 
-        open={progressDialogOpen} 
-        onClose={() => setProgressDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            Track Progress: {selectedProtocol?.title}
-            <IconButton onClick={() => setProgressDialogOpen(false)}>
-              <Close />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
-              How well did you follow this protocol today?
-            </Typography>
-            
-            <Box sx={{ px: 2, py: 3 }}>
-              <Slider
-                value={progressValue}
-                onChange={(e, value) => setProgressValue(value)}
-                min={0}
-                max={100}
-                step={5}
-                marks={[
-                  { value: 0, label: '0%' },
-                  { value: 25, label: '25%' },
-                  { value: 50, label: '50%' },
-                  { value: 75, label: '75%' },
-                  { value: 100, label: '100%' }
-                ]}
-                sx={{ mb: 2 }}
-              />
-              
-              <Typography 
-                variant="h6" 
-                color={`${getProgressColor(progressValue)}.main`}
-                sx={{ textAlign: 'center', fontWeight: 600 }}
-              >
-                {progressValue}% - {getProgressText(progressValue)}
-              </Typography>
-            </Box>
-
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              label="Notes (optional)"
-              placeholder="How did it go? Any observations or challenges?"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              sx={{ mt: 3 }}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setProgressDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button 
-            variant="contained" 
-            onClick={handleSaveProgress}
-            startIcon={<CheckCircle />}
-            disabled={saving}
-          >
-            {saving ? 'Saving...' : 'Save Progress'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

@@ -89,8 +89,9 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
   };
 
-  const updateUserProtocols = (protocols) => {
-    setUser(prev => ({ ...prev, protocols }));
+
+  const updateUser = (newUser) => {
+    setUser(newUser);
   };
 
   const value = {
@@ -99,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    updateUserProtocols,
+    updateUser,
     isAuthenticated: !!user
   };
 

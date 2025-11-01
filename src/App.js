@@ -43,7 +43,7 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000
 const AppContent = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
-  const { user, loading, logout, updateUserProtocols } = useAuth();
+  const { user, loading, logout, updateUser } = useAuth();
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -76,9 +76,8 @@ const AppContent = () => {
         instructions: protocol.instructions
       });
       
-      // Update local state
       const updatedProtocols = [...user.protocols, response.data.protocol];
-      updateUserProtocols(updatedProtocols);
+      updateUser({ ...user, protocols: updatedProtocols });
     } catch (error) {
       console.error('Error adding protocol:', error);
     }
@@ -88,25 +87,24 @@ const AppContent = () => {
     try {
       await axios.delete(`/api/user/protocols/${protocolId}`);
       
-      // Update local state
       const updatedProtocols = user.protocols.filter(p => p.protocolId !== protocolId);
-      updateUserProtocols(updatedProtocols);
+      updateUser({ ...user, protocols: updatedProtocols });
     } catch (error) {
       console.error('Error removing protocol:', error);
     }
   };
 
-  const updateProtocolProgress = async (protocolId, progress) => {
+  const toggleProtocolCompletion = async (protocolId, date) => {
     try {
-      const response = await axios.put(`/api/user/protocols/${protocolId}/progress`, progress);
+      const normalizedDate = date instanceof Date ? date.toISOString() : date;
+      const response = await axios.post(`/api/user/protocols/${protocolId}/completion`, { date: normalizedDate });
       
-      // Update local state
       const updatedProtocols = user.protocols.map(p => 
         p.protocolId === protocolId ? response.data.protocol : p
       );
-      updateUserProtocols(updatedProtocols);
+      updateUser({ ...user, protocols: updatedProtocols });
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error('Error toggling protocol completion:', error);
     }
   };
 
@@ -186,7 +184,7 @@ const AppContent = () => {
               <UserWall 
                 protocols={user.protocols}
                 onRemoveProtocol={removeProtocolFromWall}
-                onUpdateProgress={updateProtocolProgress}
+                onToggleProtocolCompletion={toggleProtocolCompletion}
               />
             )}
             {selectedTab === 2 && (

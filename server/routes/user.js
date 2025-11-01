@@ -72,32 +72,40 @@ router.delete('/protocols/:protocolId', auth, async (req, res) => {
   }
 });
 
-// Update protocol progress
-router.put('/protocols/:protocolId/progress', auth, async (req, res) => {
+// Toggle protocol completion for a specific date
+router.post('/protocols/:protocolId/completion', auth, async (req, res) => {
   try {
     const { protocolId } = req.params;
-    const { value, notes } = req.body;
+    const { date } = req.body;
 
     const protocol = req.user.protocols.find(p => p.protocolId === protocolId);
     if (!protocol) {
       return res.status(404).json({ message: 'Protocol not found' });
     }
 
-    // Update progress
-    protocol.progress = {
-      value: Math.max(0, Math.min(100, value || 0)),
-      notes: notes || '',
-      date: new Date()
-    };
+    if (!protocol.progressHistory) {
+      protocol.progressHistory = [];
+    }
+
+    const dateObj = new Date(date);
+    const dateIndex = protocol.progressHistory.findIndex(entry => new Date(entry.date).toDateString() === dateObj.toDateString());
+
+    if (dateIndex > -1) {
+      // Already completed today, so remove it (toggle off)
+      protocol.progressHistory.splice(dateIndex, 1);
+    } else {
+      // Not completed today, so add it (toggle on)
+      protocol.progressHistory.push({ date: dateObj });
+    }
 
     await req.user.save();
 
     res.json({
-      message: 'Progress updated successfully',
+      message: 'Protocol completion toggled successfully',
       protocol: protocol
     });
   } catch (error) {
-    console.error('Update progress error:', error);
+    console.error('Toggle completion error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

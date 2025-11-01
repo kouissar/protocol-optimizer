@@ -171,13 +171,14 @@ const ProtocolLibrary = ({ onAddProtocol, userProtocols }) => {
           <Grid item xs={12} md={5} lg={4} key={protocol.id} sx={{ maxWidth: '500px' }}>
             <Card 
               sx={{ 
-                height: '400px',
+                minHeight: expandedProtocol === protocol.id ? undefined : '400px',
+                height: expandedProtocol === protocol.id ? 'auto' : '400px',
                 width: '100%',
                 maxWidth: '100%',
                 minWidth: '300px',
                 display: 'flex',
                 flexDirection: 'column',
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                transition: 'transform 0.2s, box-shadow 0.2s, height 0.3s',
                 '&:hover': {
                   transform: 'translateY(-4px)',
                   boxShadow: 4
