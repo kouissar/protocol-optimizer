@@ -14,81 +14,53 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Slider,
-  Alert,
-  Paper,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Checkbox,
-  FormControlLabel,
-  Fab
+  Alert
 } from '@mui/material';
 import {
   Delete,
-  Edit,
   CheckCircle,
   Schedule,
-  TrendingUp,
-  Add,
-  Close,
-  Star,
-  StarBorder
+  Edit
 } from '@mui/icons-material';
 import { format, isToday } from 'date-fns';
+import ProtocolDetails from './ProtocolDetails';
 
-const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress, onToggleProtocolCompletion }) => {
+const UserWall = ({ protocols, onRemoveProtocol, onToggleProtocolCompletion }) => {
   const [selectedProtocol, setSelectedProtocol] = useState(null);
-  const [progressDialogOpen, setProgressDialogOpen] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const handleOpenProgressDialog = (protocol) => {
+  const handleOpenNotesDialog = (protocol) => {
     setSelectedProtocol(protocol);
-    setProgressValue(protocol.progress?.value || 0);
-    setNotes(protocol.progress?.notes || '');
-    setProgressDialogOpen(true);
+    const todayEntry = protocol.progressHistory?.find(entry => isToday(new Date(entry.date)));
+    setNotes(todayEntry?.notes || '');
+    setNotesDialogOpen(true);
   };
 
-  const handleSaveProgress = async () => {
+  const handleSaveNotes = async () => {
     if (selectedProtocol) {
       setSaving(true);
       try {
-        await onUpdateProgress(selectedProtocol.protocolId, {
-          value: progressValue,
-          notes: notes,
-          date: new Date()
-        });
-        setProgressDialogOpen(false);
+        await onToggleProtocolCompletion(selectedProtocol.protocolId, new Date(), notes);
+        setNotesDialogOpen(false);
       } catch (error) {
-        console.error('Error saving progress:', error);
-        // You could add a toast notification here
+        console.error('Error saving notes:', error);
       } finally {
         setSaving(false);
       }
     }
   };
 
-  const getProgressColor = (value) => {
-    if (value >= 80) return 'success';
-    if (value >= 60) return 'warning';
-    return 'error';
-  };
-
-  const getProgressText = (value) => {
-    if (value >= 90) return 'Excellent!';
-    if (value >= 80) return 'Great job!';
-    if (value >= 60) return 'Good progress';
-    if (value >= 40) return 'Keep going';
-    return 'Getting started';
-  };
-
   const isCompletedToday = (protocol) => {
     if (!protocol.progressHistory) return false;
     return protocol.progressHistory.some(entry => isToday(new Date(entry.date)));
+  };
+
+  const getTodaysNotes = (protocol) => {
+    if (!protocol.progressHistory) return null;
+    const todayEntry = protocol.progressHistory.find(entry => isToday(new Date(entry.date)));
+    return todayEntry?.notes;
   };
 
   if (protocols.length === 0) {
@@ -119,99 +91,127 @@ const UserWall = ({ protocols, onRemoveProtocol, onUpdateProgress, onToggleProto
       </Box>
 
       <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
-        {protocols.map((protocol) => (
-          <Grid item xs={12} md={5} lg={4} key={protocol.protocolId} sx={{ maxWidth: '500px' }}>
-            <Card 
-              sx={{ 
-                height: '400px',
-                width: '100%',
-                maxWidth: '100%',
-                minWidth: '300px',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'relative',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: 4
-                }
-              }}
-            >
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Typography variant="h6" component="h3" sx={{ fontWeight: 600, flexGrow: 1 }}>
-                    {protocol.title}
-                  </Typography>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => onRemoveProtocol(protocol.protocolId)}
-                    sx={{ color: 'error.main' }}
+        {protocols.map((protocol) => {
+          const todaysNotes = getTodaysNotes(protocol);
+          return (
+            <Grid item xs={12} md={5} lg={4} key={protocol.protocolId} sx={{ maxWidth: '500px' }}>
+              <Card 
+                sx={{ 
+                  height: 'auto',
+                  width: '100%',
+                  maxWidth: '100%',
+                  minWidth: '300px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 4
+                  }
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Typography variant="h6" component="h3" sx={{ fontWeight: 600, flexGrow: 1 }}>
+                      {protocol.title}
+                    </Typography>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => onRemoveProtocol(protocol.protocolId)}
+                      sx={{ color: 'error.main' }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
+
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ 
+                      mb: 2,
+                      wordWrap: 'break-word',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical'
+                    }}
                   >
-                    <Delete />
-                  </IconButton>
-                </Box>
+                    {protocol.description}
+                  </Typography>
 
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  sx={{ 
-                    mb: 2,
-                    wordWrap: 'break-word',
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical'
-                  }}
-                >
-                  {protocol.description}
-                </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                    <Chip 
+                      label={protocol.difficulty} 
+                      size="small" 
+                      color={protocol.difficulty === 'Easy' ? 'success' : protocol.difficulty === 'Medium' ? 'warning' : 'error'}
+                      variant="outlined"
+                    />
+                    <Chip 
+                      icon={<Schedule />} 
+                      label={protocol.timeRequired} 
+                      size="small" 
+                      variant="outlined"
+                    />
+                    <Chip 
+                      label={protocol.frequency} 
+                      size="small" 
+                      variant="outlined"
+                    />
+                  </Box>
+                  <ProtocolDetails protocol={protocol} />
+                  {todaysNotes && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2" color="text.secondary">Today's Notes:</Typography>
+                      <Typography variant="body2">{todaysNotes}</Typography>
+                    </Box>
+                  )}
+                </CardContent>
 
-                <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                  <Chip 
-                    label={protocol.difficulty} 
-                    size="small" 
-                    color={protocol.difficulty === 'Easy' ? 'success' : protocol.difficulty === 'Medium' ? 'warning' : 'error'}
-                    variant="outlined"
-                  />
-                  <Chip 
-                    icon={<Schedule />} 
-                    label={protocol.timeRequired} 
-                    size="small" 
-                    variant="outlined"
-                  />
-                  <Chip 
-                    label={protocol.frequency} 
-                    size="small" 
-                    variant="outlined"
-                  />
-                </Box>
-              </CardContent>
-
-              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Button
-                  variant={isCompletedToday(protocol) ? 'contained' : 'outlined'}
-                  size="small"
-                  startIcon={isCompletedToday(protocol) ? <CheckCircle /> : null}
-                  onClick={() => {
-                    try {
-                      onToggleProtocolCompletion(protocol.protocolId, new Date());
-                    } catch (e) {
-                      // Fallback console for visibility if handler is missing
-                      // This should never happen in normal flow
-                      // eslint-disable-next-line no-console
-                      console.error('Toggle completion handler failed:', e);
-                    }
-                  }}
-                  disabled={isCompletedToday(protocol)}
-                  sx={{ textTransform: 'none' }}
-                >
-                  {isCompletedToday(protocol) ? 'Completed' : 'Mark as Done'}
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
+                <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                  <Button
+                    variant={isCompletedToday(protocol) ? 'contained' : 'outlined'}
+                    size="small"
+                    startIcon={isCompletedToday(protocol) ? <CheckCircle /> : null}
+                    onClick={() => handleOpenNotesDialog(protocol)}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {isCompletedToday(protocol) ? 'Completed' : 'Mark as Done'}
+                  </Button>
+                  {isCompletedToday(protocol) && (
+                    <IconButton size="small" onClick={() => handleOpenNotesDialog(protocol)}>
+                      <Edit />
+                    </IconButton>
+                  )}
+                </CardActions>
+              </Card>
+            </Grid>
+          )}
+        )}
       </Grid>
+
+      <Dialog open={notesDialogOpen} onClose={() => setNotesDialogOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Add Notes</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Notes"
+            type="text"
+            fullWidth
+            multiline
+            rows={4}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setNotesDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveNotes} disabled={saving}>
+            {saving ? 'Saving...' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

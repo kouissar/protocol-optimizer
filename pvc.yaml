@@ -1,0 +1,15 @@
+# PersistentVolumeClaim for database storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: react-app-db-pvc
+  labels:
+    app: react-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # Uncomment and configure if using a specific storage class
+  # storageClassName: standard

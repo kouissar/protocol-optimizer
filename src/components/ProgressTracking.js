@@ -24,10 +24,10 @@ import {
   Star,
   CalendarToday
 } from '@mui/icons-material';
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, differenceInDays, eachDayOfInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, differenceInDays, eachDayOfInterval, startOfToday, endOfToday, isToday } from 'date-fns';
 
 const ProgressTracking = ({ protocols }) => {
-  const [selectedTimeframe, setSelectedTimeframe] = useState('week');
+  const [selectedTimeframe, setSelectedTimeframe] = useState('day');
 
   const handleTimeframeChange = (event, newValue) => {
     setSelectedTimeframe(newValue);
@@ -38,6 +38,11 @@ const ProgressTracking = ({ protocols }) => {
     let startDate, endDate, label;
 
     switch (selectedTimeframe) {
+      case 'day':
+        startDate = startOfToday();
+        endDate = endOfToday();
+        label = 'Today';
+        break;
       case 'month':
         startDate = startOfMonth(now);
         endDate = endOfMonth(now);
@@ -62,6 +67,72 @@ const ProgressTracking = ({ protocols }) => {
       isWithinInterval(new Date(entry.date), { start: startDate, end: endDate })
     ) || []
   }));
+
+  const calculateDailyCompliance = () => {
+    if (protocols.length === 0) return 0;
+    const completedToday = protocols.filter(p => p.progressHistory && p.progressHistory.some(entry => isToday(new Date(entry.date)))).length;
+    return Math.round((completedToday / protocols.length) * 100);
+  };
+
+  const calculateStreaks = () => {
+    if (protocols.length === 0) return { current: 0, longest: 0 };
+
+    const allCompletionDates = {};
+    protocols.forEach(p => {
+      if (p.progressHistory) {
+        p.progressHistory.forEach(entry => {
+          const date = new Date(entry.date).toDateString();
+          if (!allCompletionDates[date]) {
+            allCompletionDates[date] = new Set();
+          }
+          allCompletionDates[date].add(p.protocolId);
+        });
+      }
+    });
+
+    const sortedDates = Object.keys(allCompletionDates).sort((a, b) => new Date(a) - new Date(b));
+
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let lastDate = null;
+
+    for (const dateStr of sortedDates) {
+      const day = new Date(dateStr);
+      const completedOnDay = allCompletionDates[dateStr].size;
+
+      if (completedOnDay === protocols.length) {
+        if (lastDate) {
+          const diff = differenceInDays(day, lastDate);
+          if (diff === 1) {
+            currentStreak++;
+          } else if (diff > 1) {
+            longestStreak = Math.max(longestStreak, currentStreak);
+            currentStreak = 1;
+          }
+        } else {
+          currentStreak = 1;
+        }
+        lastDate = day;
+      }
+    }
+
+    longestStreak = Math.max(longestStreak, currentStreak);
+
+    // Check if today is part of the streak
+    const today = new Date();
+    if (lastDate && !isToday(lastDate) && differenceInDays(today, lastDate) > 1) {
+      currentStreak = 0;
+    }
+    
+    // If the last day of streak is not today or yesterday, reset current streak
+    if (lastDate && differenceInDays(today, lastDate) > 1) {
+        currentStreak = 0;
+    }
+
+
+    return { current: currentStreak, longest: longestStreak };
+  };
+
 
   const calculateOverallProgress = () => {
     if (filteredProtocols.length === 0) return 0;
@@ -106,6 +177,8 @@ const ProgressTracking = ({ protocols }) => {
       .sort((a, b) => a.progressHistory.length - b.progressHistory.length);
   };
 
+  const dailyCompliance = calculateDailyCompliance();
+  const streaks = calculateStreaks();
   const overallProgress = calculateOverallProgress();
   const daysApplied = getDaysApplied();
   const daysAllSatisfied = getDaysAllSatisfied();
@@ -140,6 +213,7 @@ const ProgressTracking = ({ protocols }) => {
           onChange={handleTimeframeChange}
           variant="fullWidth"
         >
+          <Tab label="Today" value="day" />
           <Tab label="This Week" value="week" />
           <Tab label="This Month" value="month" />
         </Tabs>
@@ -152,15 +226,15 @@ const ProgressTracking = ({ protocols }) => {
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <TrendingUp color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Overall Progress
+                  {selectedTimeframe === 'day' ? 'Daily Compliance' : 'Overall Progress'}
                 </Typography>
               </Box>
               <Typography variant="h3" color="primary" sx={{ fontWeight: 700, mb: 1 }}>
-                {overallProgress}%
+                {selectedTimeframe === 'day' ? `${dailyCompliance}%` : `${overallProgress}%`}
               </Typography>
               <LinearProgress 
                 variant="determinate" 
-                value={overallProgress} 
+                value={selectedTimeframe === 'day' ? dailyCompliance : overallProgress} 
                 sx={{ mb: 2, height: 8, borderRadius: 4 }}
               />
             </CardContent>
@@ -171,13 +245,13 @@ const ProgressTracking = ({ protocols }) => {
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CalendarToday color="success" sx={{ mr: 1 }} />
+                <Star color="warning" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Days Applied
+                  Current Streak
                 </Typography>
               </Box>
-              <Typography variant="h3" color="success.main" sx={{ fontWeight: 700, mb: 1 }}>
-                {daysApplied}
+              <Typography variant="h3" color="warning.main" sx={{ fontWeight: 700, mb: 1 }}>
+                {streaks.current} days
               </Typography>
             </CardContent>
           </Card>
@@ -187,18 +261,54 @@ const ProgressTracking = ({ protocols }) => {
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CheckCircle color="info" sx={{ mr: 1 }} />
+                <Star color="warning" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  All Protocols Satisfied
+                  Longest Streak
                 </Typography>
               </Box>
-              <Typography variant="h3" color="info.main" sx={{ fontWeight: 700, mb: 1 }}>
-                {daysAllSatisfied} days
+              <Typography variant="h3" color="warning.main" sx={{ fontWeight: 700, mb: 1 }}>
+                {streaks.longest} days
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      {selectedTimeframe !== 'day' && (
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CalendarToday color="success" sx={{ mr: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Days Applied
+                  </Typography>
+                </Box>
+                <Typography variant="h3" color="success.main" sx={{ fontWeight: 700, mb: 1 }}>
+                  {daysApplied}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CheckCircle color="info" sx={{ mr: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    All Protocols Satisfied
+                  </Typography>
+                </Box>
+                <Typography variant="h3" color="info.main" sx={{ fontWeight: 700, mb: 1 }}>
+                  {daysAllSatisfied} days
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>

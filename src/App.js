@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Container, AppBar, Toolbar, Typography, Tabs, Tab, Paper, IconButton, Menu, MenuItem, Avatar, CircularProgress } from '@mui/material';
+import { Box, Container, AppBar, Toolbar, Typography, Tabs, Tab, Paper, IconButton, Menu, MenuItem, Avatar, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Alert } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { AccountCircle, Logout } from '@mui/icons-material';
+import { AccountCircle, Logout, DeleteOutline } from '@mui/icons-material';
 import axios from 'axios';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -38,11 +38,17 @@ const theme = createTheme({
 });
 
 // Set up axios base URL
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// In production (served from same server), use empty string for relative URLs
+// In development, use the API URL from env or default to localhost
+const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000');
+axios.defaults.baseURL = apiUrl;
 
 const AppContent = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
   const { user, loading, logout, updateUser } = useAuth();
 
   const handleTabChange = (event, newValue) => {
@@ -60,6 +66,50 @@ const AppContent = () => {
   const handleLogout = () => {
     logout();
     handleMenuClose();
+  };
+
+  const handleDeleteDataClick = () => {
+    setDeleteDialogOpen(true);
+    setDeleteError(null);
+    handleMenuClose();
+  };
+
+  const handleDeleteDialogClose = () => {
+    if (!deleteLoading) {
+      setDeleteDialogOpen(false);
+      setDeleteError(null);
+    }
+  };
+
+  const handleDeleteDataConfirm = async () => {
+    setDeleteLoading(true);
+    setDeleteError(null);
+    
+    try {
+      const response = await axios.delete('/api/user/data');
+      
+      // Refresh user data from server to ensure consistency
+      const userResponse = await axios.get('/api/auth/me');
+      updateUser(userResponse.data.user);
+      
+      setDeleteDialogOpen(false);
+      setDeleteLoading(false);
+      
+      // Show success message
+      alert('Your data has been deleted successfully. Your account is still active.');
+    } catch (error) {
+      console.error('Error deleting user data:', error);
+      console.error('Error response:', error.response);
+      
+      // Show more detailed error message
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error 
+        || error.message 
+        || 'Failed to delete data. Please try again.';
+      
+      setDeleteError(errorMessage);
+      setDeleteLoading(false);
+    }
   };
 
   const addProtocolToWall = async (protocol) => {
@@ -94,10 +144,10 @@ const AppContent = () => {
     }
   };
 
-  const toggleProtocolCompletion = async (protocolId, date) => {
+  const toggleProtocolCompletion = async (protocolId, date, notes) => {
     try {
       const normalizedDate = date instanceof Date ? date.toISOString() : date;
-      const response = await axios.post(`/api/user/protocols/${protocolId}/completion`, { date: normalizedDate });
+      const response = await axios.post(`/api/user/protocols/${protocolId}/completion`, { date: normalizedDate, notes });
       
       const updatedProtocols = user.protocols.map(p => 
         p.protocolId === protocolId ? response.data.protocol : p
@@ -143,6 +193,10 @@ const AppContent = () => {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
+              <MenuItem onClick={handleDeleteDataClick}>
+                <DeleteOutline sx={{ mr: 1 }} />
+                Delete My Data
+              </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <Logout sx={{ mr: 1 }} />
                 Logout
@@ -200,6 +254,48 @@ const AppContent = () => {
           </Typography>
         </Box>
       </Container>
+
+      {/* Delete Data Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">
+          Delete My Data
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete all your data? This will permanently remove:
+            <ul style={{ marginTop: '8px', marginBottom: '8px' }}>
+              <li>All protocols you've added to your wall</li>
+              <li>All progress tracking data</li>
+              <li>All completion history</li>
+            </ul>
+            <strong>Your account will remain active.</strong> You can continue using the app, but all your previous data will be gone. This action cannot be undone.
+          </DialogContentText>
+          {deleteError && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {deleteError}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteDataConfirm} 
+            color="error" 
+            variant="contained"
+            disabled={deleteLoading}
+            startIcon={deleteLoading ? <CircularProgress size={16} /> : <DeleteOutline />}
+          >
+            {deleteLoading ? 'Deleting...' : 'Delete My Data'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

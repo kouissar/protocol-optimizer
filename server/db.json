@@ -41,6 +41,21 @@
             },
             {
               "date": "2025-11-01T19:32:46.872Z"
+            },
+            {
+              "date": "2025-11-02T16:01:04.651Z"
+            },
+            {
+              "date": "2025-11-03T12:56:10.085Z",
+              "notes": "Not so much light though \n"
+            },
+            {
+              "date": "2025-11-07T03:25:50.566Z",
+              "notes": ""
+            },
+            {
+              "date": "2025-11-08T15:40:10.942Z",
+              "notes": "30 mins walk \n"
             }
           ]
         },
@@ -78,6 +93,18 @@
             },
             {
               "date": "2025-11-01T19:32:49.855Z"
+            },
+            {
+              "date": "2025-11-02T16:01:08.067Z",
+              "notes": "1 cup of water at wake up"
+            },
+            {
+              "date": "2025-11-03T12:56:21.597Z",
+              "notes": ""
+            },
+            {
+              "date": "2025-11-07T03:25:57.184Z",
+              "notes": ""
             }
           ]
         },
@@ -114,6 +141,17 @@
             },
             {
               "date": "2025-11-01T19:32:54.372Z"
+            },
+            {
+              "date": "2025-11-02T16:01:10.780Z"
+            },
+            {
+              "date": "2025-11-03T12:56:34.698Z",
+              "notes": ""
+            },
+            {
+              "date": "2025-11-07T03:26:02.736Z",
+              "notes": ""
             }
           ]
         },
@@ -142,7 +180,12 @@
             "value": 0,
             "notes": "",
             "date": "2025-10-30T12:35:47.914Z"
-          }
+          },
+          "progressHistory": [
+            {
+              "date": "2025-11-02T16:29:51.095Z"
+            }
+          ]
         },
         {
           "protocolId": "wim-hof-breathing",
@@ -173,6 +216,13 @@
           "progressHistory": [
             {
               "date": "2025-10-30T12:37:52.040Z"
+            },
+            {
+              "date": "2025-11-02T23:15:11.351Z"
+            },
+            {
+              "date": "2025-11-03T12:56:47.043Z",
+              "notes": ""
             }
           ]
         },
@@ -201,7 +251,12 @@
             "value": 0,
             "notes": "",
             "date": "2025-10-30T12:36:07.053Z"
-          }
+          },
+          "progressHistory": [
+            {
+              "date": "2025-11-02T23:15:10.138Z"
+            }
+          ]
         },
         {
           "protocolId": "attia-zone-2-training",
@@ -238,6 +293,9 @@
             },
             {
               "date": "2025-11-01T19:33:02.041Z"
+            },
+            {
+              "date": "2025-11-02T19:50:17.481Z"
             }
           ]
         },
@@ -266,7 +324,16 @@
             "value": 0,
             "notes": "",
             "date": "2025-10-30T12:36:26.689Z"
-          }
+          },
+          "progressHistory": [
+            {
+              "date": "2025-11-02T23:15:07.989Z"
+            },
+            {
+              "date": "2025-11-07T03:26:10.499Z",
+              "notes": ""
+            }
+          ]
         },
         {
           "protocolId": "attia-protein-optimization",
@@ -303,6 +370,9 @@
             },
             {
               "date": "2025-11-01T19:33:05.822Z"
+            },
+            {
+              "date": "2025-11-02T23:15:00.684Z"
             }
           ]
         },
@@ -338,6 +408,9 @@
             },
             {
               "date": "2025-11-01T03:48:40.758Z"
+            },
+            {
+              "date": "2025-11-02T23:15:01.971Z"
             }
           ]
         },
@@ -370,6 +443,13 @@
           "progressHistory": [
             {
               "date": "2025-11-01T03:48:43.392Z"
+            },
+            {
+              "date": "2025-11-02T23:15:04.605Z"
+            },
+            {
+              "date": "2025-11-03T12:57:16.663Z",
+              "notes": ""
             }
           ]
         },
@@ -402,6 +482,17 @@
           "progressHistory": [
             {
               "date": "2025-11-01T03:48:44.779Z"
+            },
+            {
+              "date": "2025-11-02T23:15:03.188Z"
+            },
+            {
+              "date": "2025-11-04T00:00:46.092Z",
+              "notes": "will do tonight"
+            },
+            {
+              "date": "2025-11-07T03:26:19.271Z",
+              "notes": ""
             }
           ]
         }
@@ -411,7 +502,7 @@
         "theme": "light"
       },
       "createdAt": "2025-10-23T13:08:40.925Z",
-      "lastLogin": "2025-10-30T12:39:02.011Z"
+      "lastLogin": "2025-11-08T04:29:15.814Z"
     },
     {
       "id": "1761259427456",
@@ -480,6 +571,78 @@
       },
       "createdAt": "2025-10-23T22:43:47.456Z",
       "lastLogin": "2025-10-23T22:58:32.443Z"
+    },
+    {
+      "id": "1762571346589",
+      "name": "Joe Blake",
+      "email": "kouissar3@gmail.com",
+      "password": "$2a$10$0JHYUfjpEReC8IlHqQjcMOrZD7cAxhrabsBsNMTOX/0hT5aEqRnpm",
+      "protocols": [
+        {
+          "protocolId": "delayed-caffeine",
+          "title": "Delayed Caffeine Intake",
+          "description": "Wait 90-120 minutes after waking before consuming caffeine to allow natural cortisol peak.",
+          "category": "morning",
+          "difficulty": "Medium",
+          "timeRequired": "0 minutes (timing)",
+          "frequency": "Daily",
+          "benefits": [
+            "Prevents energy crashes",
+            "Maintains natural energy cycles",
+            "Better long-term energy"
+          ],
+          "instructions": [
+            "Wait 90-120 minutes after waking",
+            "Allow natural cortisol and adrenaline to peak first",
+            "Then consume caffeine if desired"
+          ],
+          "addedDate": "2025-11-08T04:29:40.405Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-11-08T04:29:40.405Z"
+          },
+          "progressHistory": [
+            {
+              "date": "2025-11-08T04:29:52.770Z",
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "protocolId": "ferriss-morning-pages",
+          "title": "Morning Pages",
+          "description": "Write 3 pages of stream-of-consciousness writing first thing in the morning.",
+          "category": "morning",
+          "difficulty": "Easy",
+          "timeRequired": "10-15 minutes",
+          "frequency": "Daily",
+          "benefits": [
+            "Clears mental clutter",
+            "Enhances creativity",
+            "Reduces anxiety",
+            "Improves focus"
+          ],
+          "instructions": [
+            "Write 3 pages of stream-of-consciousness",
+            "No editing or filtering thoughts",
+            "Do this before checking phone or email",
+            "Write by hand for better cognitive benefits"
+          ],
+          "addedDate": "2025-11-08T04:29:44.847Z",
+          "progress": {
+            "value": 0,
+            "notes": "",
+            "date": "2025-11-08T04:29:44.847Z"
+          }
+        }
+      ],
+      "preferences": {
+        "notifications": true,
+        "theme": "light"
+      },
+      "createdAt": "2025-11-08T03:09:06.590Z",
+      "lastLogin": "2025-11-08T04:29:31.340Z"
     }
   ]
 }

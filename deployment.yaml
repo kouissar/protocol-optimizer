@@ -3,8 +3,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: react-app-deployment
+  labels:
+    app: react-app
 spec:
-  replicas: 3
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: react-app
@@ -14,8 +18,51 @@ spec:
         app: react-app
     spec:
       containers:
-      - name: react-app
-        image: optimizer-app
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 5000
+        - name: react-app
+          image: optimizer-app
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "5000"
+            - name: DB_PATH
+              value: "/app/server/data/db.json"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: react-app-secrets
+                  key: jwt-secret
+                  optional: false
+          volumeMounts:
+            - name: db-storage
+              mountPath: /app/server/data
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: react-app-db-pvc

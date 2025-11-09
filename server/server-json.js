@@ -8,8 +8,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Database file path
-const dbPath = path.join(__dirname, 'db.json');
+// Database file path - use environment variable if set (for Kubernetes), otherwise default location
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'db.json');
 
 // Initialize database
 const initDB = () => {
@@ -359,9 +359,11 @@ app.post('/api/user/protocols/:protocolId/completion', auth, (req, res) => {
     const idx = history.findIndex(entry => new Date(entry.date).toDateString() === dateObj.toDateString());
 
     if (idx > -1) {
-      history.splice(idx, 1);
+      // Entry exists, update it
+      history[idx].notes = req.body.notes || history[idx].notes;
     } else {
-      history.push({ date: dateObj.toISOString() });
+      // Entry does not exist, create it
+      history.push({ date: dateObj.toISOString(), notes: req.body.notes || '' });
     }
 
     protocol.progressHistory = history;
@@ -374,6 +376,44 @@ app.post('/api/user/protocols/:protocolId/completion', auth, (req, res) => {
   } catch (error) {
     console.error('Toggle completion error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete user data (protocols and progress, but keep account)
+app.delete('/api/user/data', auth, (req, res) => {
+  try {
+    const db = readDB();
+    
+    if (!req.user || !req.user.id) {
+      console.error('User ID not found in request');
+      return res.status(400).json({ message: 'User ID not found' });
+    }
+
+    const user = db.users.find(u => u.id === req.user.id);
+    
+    if (!user) {
+      console.error('User not found:', req.user.id);
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Clear protocols array (this removes all protocols and their progress data)
+    user.protocols = [];
+    writeDB(db);
+
+    // Remove password from response
+    const { password, ...userWithoutPassword } = user;
+
+    res.json({
+      message: 'User data deleted successfully',
+      user: userWithoutPassword
+    });
+  } catch (error) {
+    console.error('Delete user data error:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
