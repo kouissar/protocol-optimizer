@@ -183,8 +183,21 @@ docker run -p 3000:3000 huberman-app
 Includes Kubernetes manifests for production deployment:
 
 ```bash
+# 1. Create secret
+kubectl create secret generic react-app-secrets \
+  --from-literal=jwt-secret=$(openssl rand -base64 32)
+
+# 2. Create PVC
+kubectl apply -f pvc.yaml
+
+# 3. Build and load image (if using local cluster)
+docker build -t optimizer-app .
+minikube image load optimizer-app  # or equivalent
+
+# 4. Deploy
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
+
 ```
 
 ### Database & Data Persistence
