@@ -257,3 +257,5 @@ Pod (Container Port 5000)
 - **Access method**: Depends on your cluster (LoadBalancer, port-forward, or Ingress)
 - **Default port**: Service exposes on port 80, container runs on 5000
 - **Single entry point**: One URL serves both frontend and API
+
+

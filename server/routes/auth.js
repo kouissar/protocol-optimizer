@@ -42,6 +42,7 @@ router.post('/register', async (req, res) => {
         notifications: true,
         theme: 'light'
       },
+      role: 'user',
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString()
     };

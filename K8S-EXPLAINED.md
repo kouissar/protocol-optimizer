@@ -213,3 +213,5 @@ kubectl describe pvc react-app-db-pvc
    ```bash
    kubectl cp <pod-name>:/app/server/data/db.json ./backup.json
    ```
+
+

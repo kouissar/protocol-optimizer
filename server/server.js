@@ -5,7 +5,10 @@ const FileSync = require('lowdb/adapters/FileSync');
 const path = require('path');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
+
 
 dotenv.config();
 
@@ -30,7 +33,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
