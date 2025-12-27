@@ -15,7 +15,8 @@ const server = spawn('node', ['server-json.js'], {
 const frontend = spawn('npm', ['start'], {
   cwd: __dirname,
   stdio: 'inherit',
-  shell: true
+  shell: true,
+  env: { ...process.env, HOST: '0.0.0.0' }
 });
 
 // Handle process termination

@@ -29,7 +29,7 @@ fi
 
 # Start frontend
 echo "🎨 Starting frontend..."
-npm start &
+HOST=0.0.0.0 npm start &
 FRONTEND_PID=$!
 
 echo ""
